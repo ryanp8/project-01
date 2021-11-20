@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <errno.h>
+#include <sys/wait.h>
+
+#include "trim.h"
 
 char **parse_args(char *line) {
     int spaces = 0;
@@ -12,10 +16,7 @@ char **parse_args(char *line) {
             spaces++;
         }
     }
-    // char **args = calloc(spaces + 1, sizeof(char*));
-    // char **args = malloc(spaces + 1);
-    char **args = malloc(5);
-    
+    char **args = calloc(spaces + 1, sizeof(char*));
     char *token;
     int i = 0;
     while (line) {
@@ -26,12 +27,40 @@ char **parse_args(char *line) {
     return args;
 }
 
-int main() {
-    char line[100] = "ls -a -l -i ";
+char *readln() {
+    char *buffer = malloc(256);
+    fgets(buffer, 256, stdin);
+    return buffer;
+}
 
-    char ** args = parse_args( line );
-    execvp(args[0], args);
-    free(args);
+
+void print_prompt() {
+    printf("$ ");
+}
+
+int run_proc(char **args) {
+    int f = fork();
+    if (f) {
+        int w, status;
+        w = waitpid(f, &status, 0);
+    }
+    else {
+        return execvp(args[0], args);
+    }
+    return 0;
+}
+
+int main() {
+
+    while (1) {
+        print_prompt();
+        char *line = readln();
+        char *trimmed = trim(line);
+        char **args = parse_args(trimmed);
+        run_proc(args);
+        free(line);
+    }
+
 
     return 0;
 }
