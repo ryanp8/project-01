@@ -5,37 +5,12 @@
 #include <errno.h>
 #include <sys/wait.h>
 
-#include "trim.h"
-
-char **parse_args(char *line) {
-    int spaces = 0;
-    int j;
-    int len = strlen(line);
-    for (j = 0; j < len; j++) {
-        if (line[j] == ' ') {
-            spaces++;
-        }
-    }
-    char **args = calloc(spaces + 1, sizeof(char*));
-    char *token;
-    int i = 0;
-    while (line) {
-        token = strsep(&line, " ");
-        args[i] = token;
-        i++;
-    }
-    return args;
-}
-
-char *readln() {
-    char *buffer = malloc(256);
-    fgets(buffer, 256, stdin);
-    return buffer;
-}
+#include "input.h"
+#include "util.h"
 
 
 void print_prompt() {
-    printf("$ ");
+    printf("\x1b[35m$\x1b[0m ");
 }
 
 int run_proc(char **args) {
@@ -56,8 +31,13 @@ int main() {
         print_prompt();
         char *line = readln();
         char *trimmed = trim(line);
-        char **args = parse_args(trimmed);
-        run_proc(args);
+        if (strlen(trimmed) > 1) {
+            char **args = parse_args(trimmed);
+            int res = run_proc(args);
+            if (res == -1) {
+                printf("Errno: %d, %s\n", errno, strerror(errno));
+            }
+        }
         free(line);
     }
 

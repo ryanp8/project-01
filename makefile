@@ -1,11 +1,14 @@
-all: main.o trim.o
-	gcc -o program main.o trim.o
+all: main.o input.o util.o
+	gcc -o program main.o input.o util.o
 
 main.o: main.c
 	gcc -c main.c
 
-trim.o: trim.c
-	gcc -c trim.c
+input.o: input.c input.h
+	gcc -c input.c
+
+util.o: util.c util.h
+	gcc -c util.c
 
 clean:
 	rm *.o
