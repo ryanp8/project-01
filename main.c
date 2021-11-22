@@ -23,9 +23,6 @@ void print_prompt() {
         }
         *--p = '~';
     }
-
-
-
     printf("\x1b[32m%s \x1b[36m:: ", p);
     printf("\x1b[35m$\x1b[0m ");
 }
@@ -50,6 +47,8 @@ int main() {
                 }
             }
             else if (strcmp(args[0], "exit") == 0) {
+                free(line);
+                free(args);
                 break;
             }
             else {
@@ -58,6 +57,7 @@ int main() {
             if (res == -1) {
                 printf("Error %d: %s\n", errno, strerror(errno));
             }
+            free(args);
         }
         free(line);
     }
