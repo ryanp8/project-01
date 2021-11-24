@@ -1,5 +1,6 @@
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 #include "util.h"
 
@@ -38,4 +39,15 @@ int charcount(char *line, char c) {
         }
     }
     return count;
+}
+
+char **split(char *input, char tok) {
+    int tok_count = charcount(input, tok);
+    char **parsed = calloc(tok_count + 2, sizeof(char*));
+    int i = 0;
+    while(input) {
+        parsed[i] = strsep(&input, &tok);
+        i++;
+    }
+    return parsed;
 }

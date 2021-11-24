@@ -12,15 +12,22 @@ char *readln() {
     return buffer;
 }
 
-char **parse_args(char *line) {
-    int spaces = charcount(line, ' ');
-    char **args = calloc(spaces + 2, sizeof(char*));
-    char *token;
-    int i = 0;
-    while (line) {
-        token = strsep(&line, " ");
-        args[i] = token;
-        i++;
-    }
+char **parse_args(char *input) {
+    char **args = split(input, ' ');
     return args;
 }
+
+char **parse_commands(char *input) {
+    char **commands = split(input, ';');
+    return commands;
+}
+
+char **parse_pipe(char *input) {
+    char **pipes = split(input, '|');
+    return pipes;
+}
+
+// char **parse_redirect(char *input) {
+//     char **redirections = split(input, '');
+//     return redirections;
+// }

@@ -23,8 +23,7 @@ void print_prompt() {
         }
         *--p = '~';
     }
-    printf("\x1b[32m%s \x1b[36m:: ", p);
-    printf("\x1b[35m$\x1b[0m ");
+    printf("MYSH \x1b[35m:: \x1b[32m%s \x1b[36m$\x1b[0m ", p);
 }
 
 int main() {
@@ -35,29 +34,8 @@ int main() {
         print_prompt();
         char *line = readln();
         char *trimmed = trim(line);
-        if (strlen(trimmed) > 0) {
-            char **args = parse_args(trimmed);
-            int res;
-            if (strcmp(args[0], "cd") == 0) {
-                if (args[1]) {
-                    res = cd(args[1]);
-                }
-                else {
-                    cd("~");
-                }
-            }
-            else if (strcmp(args[0], "exit") == 0) {
-                free(line);
-                free(args);
-                break;
-            }
-            else {
-                res = run_proc(args);
-            }
-            if (res == -1) {
-                printf("Error %d: %s\n", errno, strerror(errno));
-            }
-            free(args);
+        if (run(trimmed) == -1) {
+            break;
         }
         free(line);
     }
