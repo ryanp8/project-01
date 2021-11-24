@@ -33,8 +33,7 @@ int main() {
     while (1) {
         print_prompt();
         char *line = readln();
-        char *trimmed = trim(line);
-        if (run(trimmed) == -1) {
+        if (run(line) == -1) {
             break;
         }
         free(line);

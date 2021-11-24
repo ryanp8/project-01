@@ -14,30 +14,30 @@ int run(char *input) {
     char **commands = parse_commands(input);
     int i = 0;
     while (commands[i]) {
-        if (strlen(input) > 0) {
-            char **args = parse_args(commands[i]);
-            int res;
-            if (strcmp(args[0], "cd") == 0) {
-                if (args[1]) {
-                    res = cd(args[1]);
-                }
-                else {
-                    cd("~");
-                }
-            }
-            else if (strcmp(args[0], "exit") == 0) {
-                free(input);
-                free(args);
-                return -1;
+        char *trimmed = trim(commands[i]);
+        char **args = parse_args(trimmed);
+        int res;
+        if (strcmp(args[0], "cd") == 0) {
+            if (args[1]) {
+                res = cd(args[1]);
             }
             else {
-                res = run_proc(args);
+                cd("~");
             }
-            if (res == -1) {
-                printf("Error %d: %s\n", errno, strerror(errno));
-            }
-            free(args);
         }
+        else if (strcmp(args[0], "exit") == 0) {
+            free(input);
+            free(args);
+            free(commands);
+            return -1;
+        }
+        else {
+            res = run_proc(args);
+        }
+        if (res == -1) {
+            printf("Error %d: %s\n", errno, strerror(errno));
+        }
+        free(args);
         i++;
     }
     free(commands);
