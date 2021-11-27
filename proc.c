@@ -4,6 +4,7 @@
 #include <sys/wait.h>
 #include <string.h>
 #include <errno.h>
+#include <signal.h>
 
 #include "util.h"
 #include "proc.h"
@@ -52,8 +53,12 @@ int run_proc(char **args) {
         w = waitpid(f, &status, 0);
     }
     else {
-        printf("[%s]\n", args[0]);
-        return execvp(args[0], args);
+        int res = execvp(args[0], args);
+        if (res == -1) {
+            printf("command not found: %s\n", args[0]);
+            kill(getpid(), 2);
+        }
+        return res;
     }
     return 0;
 }

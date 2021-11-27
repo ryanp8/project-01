@@ -1,6 +1,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "util.h"
 
@@ -44,9 +45,12 @@ int charcount(char *line, char c) {
 char **split(char *input, char tok) {
     int tok_count = charcount(input, tok);
     char **parsed = calloc(tok_count + 2, sizeof(char*));
+    char tokstr[2];
+    tokstr[0] = tok;
+    tokstr[1] = '\0';
     int i = 0;
     while(input) {
-        parsed[i] = strsep(&input, &tok);
+        parsed[i] = strsep(&input, tokstr);
         i++;
     }
     return parsed;
