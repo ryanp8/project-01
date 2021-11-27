@@ -17,10 +17,11 @@ int run(char *input) {
     while (commands[i]) {
         char *trimmed = trim(commands[i]);
         char **args = parse_args(trimmed);
-        int res;
         if (strcmp(args[0], "cd") == 0) {
             if (args[1]) {
-                res = cd(args[1]);
+                if (cd(args[1]) == -1) {
+                    printf("Error %d: %s\n", errno, strerror(errno));
+                }
             }
             else {
                 cd("~");
@@ -33,10 +34,7 @@ int run(char *input) {
             return -1;
         }
         else {
-            res = run_proc(args);
-        }
-        if (res == -1) {
-            printf("Error %d: %s\n", errno, strerror(errno));
+            run_proc(args);
         }
         free(args);
         i++;
@@ -46,7 +44,7 @@ int run(char *input) {
 }
 
 
-int run_proc(char **args) {
+void run_proc(char **args) {
     int f = fork();
     if (f) {
         int w, status;
@@ -58,9 +56,7 @@ int run_proc(char **args) {
             printf("command not found: %s\n", args[0]);
             kill(getpid(), 2);
         }
-        return res;
     }
-    return 0;
 }
 
 int cd(char *path) {
