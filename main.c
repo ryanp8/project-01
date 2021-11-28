@@ -8,6 +8,11 @@
 #include "proc.h"
 #include "util.h"
 
+// some test cases:
+//                       ps                                                   ;                                              pwd              ; ls         ;       whoami
+//                       ps                                                   ;                                              pwd              ; ls -a -l -G       ;       whoami
+// ps;pwd;ls;whoami
+
 
 void print_prompt() {
     char cwd[MAX_PATH_LEN] = {0};
@@ -33,12 +38,14 @@ int main() {
     while (1) {
         print_prompt();
         char *line = readln();
-        if (run(line) == -1) {
-            break;
+        line[strlen(line) - 1] = 0;
+        if (strlen(line) > 1) { // greater than 1 to account for automatic newline in stdin
+            if (run(line) == -1) {
+                break;
+            }
         }
         free(line);
     }
-
 
     return 0;
 }

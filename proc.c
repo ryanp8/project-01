@@ -4,6 +4,7 @@
 #include <sys/wait.h>
 #include <string.h>
 #include <errno.h>
+#include <signal.h>
 
 #include "util.h"
 #include "proc.h"
@@ -27,12 +28,14 @@ int run(char *input)
             printf("pipe detected");
         }
         char **args = parse_args(trimmed);
-        int res;
         if (strcmp(args[0], "cd") == 0)
         {
             if (args[1])
             {
-                res = cd(args[1]);
+                if (cd(args[1]) == -1)
+                {
+                    printf("Error %d: %s\n", errno, strerror(errno));
+                }
             }
             else
             {
@@ -48,11 +51,7 @@ int run(char *input)
         }
         else
         {
-            res = run_proc(args);
-        }
-        if (res == -1)
-        {
-            printf("Error %d: %s\n", errno, strerror(errno));
+            run_proc(args);
         }
         free(args);
         i++;
@@ -61,7 +60,7 @@ int run(char *input)
     return 0;
 }
 
-int run_proc(char **args)
+void run_proc(char **args)
 {
     int f = fork();
     if (f)
@@ -71,10 +70,13 @@ int run_proc(char **args)
     }
     else
     {
-        printf("[%s]\n", args[0]);
-        return execvp(args[0], args);
+        int res = execvp(args[0], args);
+        if (res == -1)
+        {
+            printf("command not found: %s\n", args[0]);
+            kill(getpid(), 2);
+        }
     }
-    return 0;
 }
 
 int cd(char *path)
