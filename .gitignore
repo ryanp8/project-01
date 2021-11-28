@@ -1,0 +1,20 @@
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
+
+# Unignore all dirs
+!*/
+
+#Unignore makefile
+!makefile
+
+# Ignore executable and o files
+*a.out
+*.out
+*.o
+
+#ignore ds file
+.DS_Store
+*.DS_Store
