@@ -112,9 +112,12 @@ void mypipe(char *input)
 
     FILE *output_stream = popen(parsed[0], "r");
 
+    printf("inside pipe");
+
     int counter = 1;
     while (parsed[counter])
     {
+        printf("inside pipe \n");
         char buffer[2056];
         int i = 0;
         char c;
@@ -129,11 +132,12 @@ void mypipe(char *input)
         pclose(output_stream);
 
         //getting output for command if multiple piping is present
-        output_stream = popen(parsed[counter], "r");
+        // output_stream = popen(parsed[counter], "r");
         pclose(input_stream);
+        counter++;
     }
 
-    pclose(output_stream);
+    // pclose(output_stream);
 
     free(parsed);
 }
