@@ -106,18 +106,45 @@ int cd(char *path)
     }
 }
 
+void mypipeSupport(FILE *output, char *parse)
+{
+    char buffer[2056];
+    char *bufferP = buffer;
+    int i = 0;
+    char c;
+    while ((buffer[i] = fgetc(output)) != EOF)
+    {
+        i++;
+    }
+    buffer[i] = '\0';
+
+    char *new_str;
+    if ((new_str = malloc(strlen(parse) + strlen(bufferP) + 1)) != NULL)
+    {
+        new_str[0] = '\0'; // ensures the memory is an empty string
+        strcat(new_str, parse);
+        strcat(new_str, bufferP);
+    }
+    else
+    {
+        printf("malloc failed!\n");
+    }
+
+    printf("command: \t %s \n", new_str);
+}
+
 void mypipe(char *input)
 {
     char **parsed = parse_pipe(input);
 
     FILE *output_stream = popen(parsed[0], "r");
 
-    printf("inside pipe");
+    mypipeSupport(output_stream, parsed[0]);
 
     int counter = 1;
     while (parsed[counter])
     {
-        printf("inside pipe \n");
+        printf("\ninside pipe \n");
         char buffer[2056];
         int i = 0;
         char c;
