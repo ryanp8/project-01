@@ -14,23 +14,6 @@
 // ps;pwd;ls;whoami
 
 
-void print_prompt() {
-    char cwd[MAX_PATH_LEN] = {0};
-    char *p = getcwd(cwd, sizeof(cwd));
-    if (charcount(p, '/') > 1) {
-        p[strlen(p)] = '/';
-
-        strsep(&p, "/");
-        strsep(&p, "/");
-
-        while ((*p) != '/') {
-            p++;
-        }
-        *--p = '~';
-    }
-    printf("MYSH \x1b[35m:: \x1b[32m%s \x1b[0m\n", p);
-}
-
 int main() {
 
     // cd("~");
@@ -47,7 +30,6 @@ int main() {
             }
         }
         free(line);
-        // sleep(1);
     }
 
     return 0;

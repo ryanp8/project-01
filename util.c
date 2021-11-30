@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "util.h"
 
@@ -63,4 +64,21 @@ char **split(char *input, char *tok) {
         i++;
     }
     return parsed;
+}
+
+void print_prompt() {
+    char cwd[MAX_PATH_LEN] = {0};
+    char *p = getcwd(cwd, sizeof(cwd));
+    if (charcount(p, '/') > 1) {
+        p[strlen(p)] = '/';
+
+        strsep(&p, "/");
+        strsep(&p, "/");
+
+        while ((*p) != '/') {
+            p++;
+        }
+        *--p = '~';
+    }
+    printf("MYSH \x1b[35m:: \x1b[32m%s \x1b[0m\n", p);
 }
