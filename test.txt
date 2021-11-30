@@ -1,4 +1,3 @@
-ls;pwd
-                      ps                                                   ;                                              pwd              ; ls         ;       whoami
-                      ps                                                   ;                                              pwd              ; ls -a -l -G         ;       whoami
-ls  |  wc
+                       ps                                                   ;                                              pwd              ; ls         ;       whoami
+                       ps                                                   ;                                              pwd              ; ls -a -l -G       ;       whoami
+ps;pwd;ls;whoami

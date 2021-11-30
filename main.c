@@ -28,7 +28,7 @@ void print_prompt() {
         }
         *--p = '~';
     }
-    printf("MYSH \x1b[35m:: \x1b[32m%s \x1b[36m$\x1b[0m ", p);
+    printf("MYSH \x1b[35m:: \x1b[32m%s \x1b[0m\n", p);
 }
 
 int main() {
@@ -38,7 +38,6 @@ int main() {
     while (1) {
         print_prompt();
         char *line = readln();
-        printf("Running %s\n", line);
         if (!line) {
             break;
         }
