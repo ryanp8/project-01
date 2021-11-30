@@ -42,15 +42,24 @@ int charcount(char *line, char c) {
     return count;
 }
 
-char **split(char *input, char tok) {
-    int tok_count = charcount(input, tok);
+int substrcount(char *line, char *substr) {
+    int count = 0;
+    while ((line = strstr(line, substr) + 1) - 1) {        
+        count++;
+    }
+    return count;
+}
+
+
+char **split(char *input, char *tok) {
+    int tok_count = substrcount(input, tok);
     char **parsed = calloc(tok_count + 2, sizeof(char*));
-    char tokstr[2];
-    tokstr[0] = tok;
-    tokstr[1] = '\0';
     int i = 0;
     while(input) {
-        parsed[i] = strsep(&input, tokstr);
+        parsed[i] = strsep(&input, tok);
+        if (input) {
+            input += strlen(tok) - 1;
+        }
         i++;
     }
     return parsed;

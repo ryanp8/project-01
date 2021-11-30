@@ -3,5 +3,6 @@
 #define MAX_PATH_LEN 256
 char *trim(char *line);
 int charcount(char *line, char c);
-char **split(char *input, char tok);
+int substrcount(char *line, char *substr);
+char **split(char *input, char* tok);
 #endif

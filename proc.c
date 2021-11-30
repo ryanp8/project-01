@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <string.h>
@@ -16,27 +17,38 @@ int run(char *input) {
     int i = 0;
     while (commands[i]) {
         char *trimmed = trim(commands[i]);
-        char **args = parse_args(trimmed);
-        if (strcmp(args[0], "cd") == 0) {
-            if (args[1]) {
-                if (cd(args[1]) == -1) {
-                    printf("Error %d: %s\n", errno, strerror(errno));
-                }
-            }
-            else {
-                cd("~");
-            }
+        if (strchr(trimmed, '|')) {
+            mypipe(trimmed);
         }
-        else if (strcmp(args[0], "exit") == 0) {
-            free(input);
-            free(args);
-            free(commands);
-            return -1;
+        else if (strstr(trimmed, ">>")){
+            redirect_stdout(trimmed, 1);
+        }
+        else if (strchr(trimmed, '>')) {
+            redirect_stdout(trimmed, 0);
+        }
+        else if (strchr(trimmed, '<')) {
+            redirect_stdin(trimmed);
         }
         else {
-            run_proc(args);
+            char **args = parse_args(trimmed);
+            if (strcmp(args[0], "cd") == 0) {
+                if (args[1]) {
+                    if (cd(args[1]) == -1) {
+                        printf("Error %d: %s\n", errno, strerror(errno));
+                    }
+                }
+                else {
+                    cd("~");
+                }
+            }
+            else if (strcmp(args[0], "exit") == 0) {
+                return -1;
+            }
+            else {
+                run_proc(args);
+            }
+            free(args);
         }
-        free(args);
         i++;
     }
     free(commands);
@@ -72,4 +84,75 @@ int cd(char *path) {
     else {
         return chdir(path);
     }
+}
+
+void mypipe(char *input) {
+    char **parsed = parse_pipe(input);
+
+    FILE *output_stream = popen(parsed[0], "r");
+
+    char buffer[2056];
+    int i = 0;
+    char c;
+    while((buffer[i] = fgetc(output_stream)) != EOF) {
+        i++;
+    }
+    buffer[i] = '\0';
+    pclose(output_stream);
+
+    FILE *input_stream = popen(parsed[1], "w");
+    fputs(buffer, input_stream);
+
+    pclose(input_stream);
+    free(parsed);
+}
+
+
+void redirect_stdout(char *input, char append) {
+    char **parsed;
+    if (append) {
+        parsed = parse_append_stdout_redirect(input);
+    }
+    else {
+        parsed = parse_stdout_redirect(input);
+    }
+    char *trimmed = trim(parsed[1]);
+
+    int flag = append ? O_APPEND : O_TRUNC;
+    int fd = open(trimmed, O_WRONLY | flag, 0644);
+    if (fd == -1) {
+        printf("%s: %s\n", trimmed, strerror(errno));
+        return;
+    }
+    int tmp_stdout = dup(STDOUT_FILENO);
+    dup2(fd, STDOUT_FILENO);
+
+    char **args = parse_args(trim(parsed[0]));
+    run_proc(args);
+
+    dup2(tmp_stdout, STDOUT_FILENO);
+    free(parsed);
+    free(args);
+}
+
+
+void redirect_stdin(char *input) {
+    char **parsed = parse_stdin_redirect(input);
+    char *trimmed = trim(parsed[1]);
+
+    int fd = open(trimmed, O_RDONLY);
+    if (fd == -1) {
+        printf("%s: %s\n", trimmed, strerror(errno));
+        return;
+    }
+
+    int tmp_stdin = dup(STDIN_FILENO);
+    dup2(fd, STDIN_FILENO);
+
+    char **args = parse_args(trim(parsed[0]));
+    run_proc(args);
+
+    dup2(tmp_stdin, STDIN_FILENO);
+    free(parsed);
+    free(args);
 }

@@ -33,18 +33,22 @@ void print_prompt() {
 
 int main() {
 
-    cd("~");
+    // cd("~");
 
     while (1) {
         print_prompt();
         char *line = readln();
-        line[strlen(line) - 1] = 0;
+        printf("Running %s\n", line);
+        if (!line) {
+            break;
+        }
         if (strlen(line) > 1) { // greater than 1 to account for automatic newline in stdin
             if (run(line) == -1) {
                 break;
             }
         }
         free(line);
+        // sleep(1);
     }
 
     return 0;
