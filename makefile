@@ -18,4 +18,4 @@ clean:
 	rm program
 
 run:
-	make && ./program
+	./program
